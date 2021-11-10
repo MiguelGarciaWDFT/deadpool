@@ -1,53 +1,135 @@
-let canvas = document.querySelector('canvas');
-let ctx = canvas.getContext('2d');
+//Definir canvas
+const $canvas = document.querySelector("canvas")
+const ctx = $canvas.getContext("2d")
 
-canvas.width = 600;
-canvas.height = 600;
 
-let img = new Image();
-img.src = '/images/deadpool.png';
-
-let animate = 0
+//Variables globales
 let frames = 0
-let interval
-const cycleLoop = [0, 1, 0, 2, 0, 3, 0, 4]
+const friction = 0.95 //resistencia a moverse
 
-const background = new Image()
-background.src = "/imagenes deadpool/gameback.png";
+//const fondoImage = new Image()
+//fondoImage.src = "/FRAMES DEADPOOL/gameback.png"
 
-/*function fondo() {
-    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-    requestAnimationFrame(fondo);
+
+const looseImage = new Image()
+looseImage.src = "/FRAMES DEADPOOL/death_scythe.png"
+
+const winImage = new Image()
+winImage.src = "/FRAMES DEADPOOL/vanessa.png"
+
+const playerImage = new Image()
+playerImage.src = "/FRAMES DEADPOOL/frame-1.png"
+
+//const leftImage = new Image()
+//leftImage.src = "/FRAMES DEADPOOL/frame-2.png"
+
+const hulkImage = new Image()
+hulkImage.src = "/FRAMES DEADPOOL/hulk.png"
+
+
+
+//Definir clases y sus metodos(fondos, personajes, enemigos)
+class Character {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = 50;
+        this.heigth = 50;
+        this.vx = 0;
+        this.vy = 0;
+
+    }
+    draw() {
+        if (this.y >= $canvas.height - this.heigth) {
+            this.y = $canvas.height - this.heigth;
+        }
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= friction;
+        this.vy *= friction;
+        ctx.drawImage(playerImage, this.x, this.y, this.width, this.heigth);
+        //ctx.drawImage(fondoImage, 0, 0, this.width, this.heigth);
+        ctx.drawImage(looseImage, 0, 0, this.width, this.heigth);
+        ctx.drawImage(winImage, 50, 50, this.width, this.heigth);
+        ctx.drawImage(hulkImage, 200, 200, this.width, this.heigth);
+    }
+
+    moveLeft() {
+        this.vx--;
+        //ctx.drawImage(this.leftImage)
+    }
+    moveRight() {
+        this.vx++;
+    }
+    moveUp() {
+        this.vy--;
+    }
+    moveDown() {
+        this.vy++;
+    }
+    stop() {
+        this.vx = 0;
+        this.vy = 0;
+    }
 }
-fondo();*/
+
+//Definir instancias de las clases
+const deadpool = new Character(250, 170)
+
+//const fondoImage = "/FRAMES DEADPOOL/gameback.png"
+
+
+//Funciones del flujo del juego
+function start() {
+    setInterval(() => {
+        update()
+
+    }, 1000 / 60)
+}
 
 function update() {
-    frames++
+    //Calcular estado
+    //frames++;
+    //checkKeys();
+    if (frames % 60 === 0)
+    //Limpiar canvas
+        clearCanvas();
+    //Dibujar
+    deadpool.draw();
 
-    if (frames % 12 === 0) {
-        animate++
-        if (animate === 4) animate = 0
+}
+
+//Crear funciones de apoyo
+function clearCanvas() {
+    ctx.clearRect(0, 0, $canvas.width, $canvas.height);
+
+}
+
+
+//Funcion de interaccion con el usuario
+document.onkeydown = (event) => {
+        //keys[event.key] = true;
+        switch (event.key) {
+            case "ArrowLeft":
+                deadpool.moveLeft();
+                //ctx.drawImage(this.leftImage)
+                break;
+            case "ArrowRight":
+                deadpool.moveRight();
+                break;
+            case "ArrowUp":
+                deadpool.moveUp();
+                break;
+            case "ArrowDown":
+                deadpool.moveDown();
+                break;
+            default:
+
+        };
+        document.onkeyup = () => {
+            keys[event.key] = false;
+            deadpool.stop();
+        }
     }
-    //ctx.drawImage(img, cycleLoop[animate] * 100, 0, 32, 48, 200, 200, 100, 100)
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(
-        img, //imagen
-        cycleLoop[animate] * 100, // posición en x, de la imagen
-        // iteramos entre los estados de la imagen: 0, 16, 32
-        0, // posición en y, de la imagen
-        // iteramos entre los estados de la imagen: 0, 16, 32
-        32, // ancho de la fuente (imagen)
-        48, //alto de la fuente (imagen)
-        200, // el punto x de destino en el canvas
-        200, // el punto y de destino en el canvas
-        100, // ancho de la imagen en canvas
-        100 // alto de la imagen en canvas
-    );
-}
-
-
-function init() {
-    interval = setInterval(update, 1500 / 60)
-}
-
-//init()
+    //Iniciar juego
+start();
